@@ -46,6 +46,6 @@ use VS Code Live Server. The form will not submit until step 8 is complete.
 VALIDATION
 - Required full name, Indian mobile number, email, course, program, and consent
 - Name, email, and mobile format checks
-- Date of birth cannot be in the future
+- Optional date of course accepts past or future dates
 - Length limits, honeypot, and server-side checks
 - Submission and email confirmation through Google Apps Script

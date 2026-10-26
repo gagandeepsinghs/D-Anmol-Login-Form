@@ -4,7 +4,7 @@ const OWNER_EMAIL = 'sgagan7788@gmail.com';
 const HEADERS = [
   'Submitted At',
   'Full Name',
-  'Date of Birth',
+  'Date of Course',
   'Mobile Number',
   'Email Address',
   'Address',
@@ -20,6 +20,7 @@ function setupRegistrationSheet() {
   const sheet = getRegistrationSheet();
   MailApp.getRemainingDailyQuota();
   sheet.setFrozenRows(1);
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
   sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
   sheet.autoResizeColumns(1, HEADERS.length);
   console.log('Registration sheet ready: ' + sheet.getParent().getUrl());
@@ -73,7 +74,7 @@ function getRegistrationSheet() {
 function validateRegistration(parameters) {
   const registration = {
     name: cleanValue(parameters.name, 80),
-    dob: cleanValue(parameters.dob, 10),
+    courseDate: cleanValue(parameters.courseDate, 10),
     phone: cleanValue(parameters.phone, 14),
     email: cleanValue(parameters.email, 254),
     address: cleanValue(parameters.address, 300),
@@ -101,12 +102,15 @@ function validateRegistration(parameters) {
   if (!registration.course || !registration.program || !registration.consent) {
     throw new Error('Missing required registration details.');
   }
-  if (registration.dob) {
-    const date = new Date(registration.dob + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (isNaN(date.getTime()) || date > today) {
-      throw new Error('Invalid date of birth.');
+  if (registration.courseDate) {
+    const dateParts = registration.courseDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const date = dateParts && new Date(Date.UTC(
+      Number(dateParts[1]),
+      Number(dateParts[2]) - 1,
+      Number(dateParts[3])
+    ));
+    if (!date || date.toISOString().slice(0, 10) !== registration.courseDate) {
+      throw new Error('Invalid course date.');
     }
   }
 
@@ -125,7 +129,7 @@ function saveRegistration(registration) {
     const values = [
       new Date(),
       registration.name,
-      registration.dob,
+      registration.courseDate,
       registration.phone,
       registration.email,
       registration.address,
@@ -155,7 +159,7 @@ function safeCellValue(value) {
 function sendRegistrationEmails(registration) {
   const details = [
     'Name: ' + registration.name,
-    'Date of birth: ' + (registration.dob || 'Not provided'),
+    'Date of course: ' + (registration.courseDate || 'Not provided'),
     'Mobile: ' + registration.phone,
     'Email: ' + registration.email,
     'Address: ' + (registration.address || 'Not provided'),

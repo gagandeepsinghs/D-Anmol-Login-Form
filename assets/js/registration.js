@@ -4,17 +4,9 @@ const RESPONSE_TIMEOUT_MS = 45_000;
 const form = document.getElementById('registrationForm');
 const notice = document.getElementById('notice');
 const submitButton = document.getElementById('submitButton');
-const dob = document.getElementById('dob');
 const responseFrame = document.getElementById('registrationResponse');
 let pendingToken = null;
 let responseTimeout = null;
-
-function getLocalDateString(date) {
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-  return localDate.toISOString().slice(0, 10);
-}
-
-dob.max = getLocalDateString(new Date());
 
 const validators = {
   name(value) {
@@ -41,9 +33,6 @@ function validateField(field) {
   field.setCustomValidity('');
   if (field.id in validators && field.value.trim()) {
     field.setCustomValidity(validators[field.id](field.value));
-  }
-  if (field.id === 'dob' && field.value && field.value > dob.max) {
-    field.setCustomValidity('Date of birth cannot be in the future.');
   }
   return field.checkValidity();
 }
@@ -84,9 +73,7 @@ window.addEventListener('message', event => {
     showNotice(result.message || 'We could not submit your registration. Please try again later.', 'error');
     return;
   }
-
   form.reset();
-  dob.max = getLocalDateString(new Date());
   showNotice(
     result.emailWarning
       ? 'Your registration was saved, but an email could not be sent. Please contact us if you need confirmation.'
