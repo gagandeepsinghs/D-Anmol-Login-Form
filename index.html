@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d2a">
+  <meta name="description" content="Register your interest in courses, internships, and IT training from D-Anmol Enterprises.">
+  <title>D-Anmol Enterprises | Student Registration</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/registration.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="D-Anmol Enterprises home">
+      <img class="logo" src="assets/d-anmol-it-solutions-logo.png" alt="D-Anmol Enterprises">
+    </a>
+  </header>
+
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-content">
+      <p class="eyebrow">Start your learning journey</p>
+      <h1 id="page-title">Student Registration</h1>
+      <p>Tell us what you are interested in. Our team will follow up with the next steps.</p>
+    </div>
+  </section>
+
+  <main class="page-layout">
+    <section class="form-card" aria-labelledby="form-title">
+      <div class="card-head">
+        <h2 id="form-title">Registration details</h2>
+        <p>Fields marked with <span class="required-mark" aria-label="required">*</span> are required.</p>
+      </div>
+      <div class="form-body">
+        <div class="notice" id="notice" role="status" aria-live="polite"></div>
+        <form id="registrationForm" method="post" novalidate>
+          <div class="form-trap" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          <fieldset>
+            <legend class="section-title">01 <span aria-hidden="true">/</span> Personal information</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="name">Full name <span class="required-mark">*</span></label>
+                <input id="name" name="name" autocomplete="name" required minlength="2" maxlength="80" pattern="[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ .'\-]{1,79}" title="Use at least 2 letters. Spaces, apostrophes, dots and hyphens are allowed." placeholder="Enter your full name">
+              </div>
+              <div class="field">
+                <label for="dob">Date of birth</label>
+                <input id="dob" name="dob" type="date" autocomplete="bday">
+              </div>
+              <div class="field">
+                <label for="phone">Mobile number <span class="required-mark">*</span></label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="14" pattern="(\+91[ \-]?)?[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number, optionally starting with +91." placeholder="e.g. 9876543210">
+                <span class="field-hint">Indian mobile number; +91 prefix is optional.</span>
+              </div>
+              <div class="field">
+                <label for="email">Email address <span class="required-mark">*</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" title="Enter a valid email address." placeholder="you@example.com">
+              </div>
+              <div class="field field-full">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" autocomplete="street-address" maxlength="300" placeholder="House / street, area, city, state, PIN code"></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend class="section-title">02 <span aria-hidden="true">/</span> Course preferences</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="course">Course interested in <span class="required-mark">*</span></label>
+                <select id="course" name="course" required>
+                  <option value="">Choose a course</option>
+                  <option>Python Programming</option>
+                  <option>Data Analytics</option>
+                  <option>Data Science</option>
+                  <option>Artificial Intelligence / Machine Learning</option>
+                  <option>Full Stack Development</option>
+                  <option>Digital Marketing</option>
+                  <option>Computer Basics</option>
+                  <option>AI Automation</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="program">Program type <span class="required-mark">*</span></label>
+                <select id="program" name="program" required>
+                  <option value="">Choose program</option>
+                  <option>Internship</option>
+                  <option>IT Training</option>
+                  <option>Teaching / Course</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="duration">Preferred duration</label>
+                <select id="duration" name="duration">
+                  <option value="">Select duration</option>
+                  <option>45 days</option>
+                  <option>3 months</option>
+                  <option>6 months</option>
+                  <option>Other / discuss with team</option>
+                </select>
+              </div>
+              <div class="field field-full">
+                <label for="education">Education / qualification</label>
+                <input id="education" name="education" maxlength="120" placeholder="e.g. 12th, BCA, B.Tech, currently studying">
+              </div>
+              <div class="field field-full">
+                <label for="message">Questions or additional details</label>
+                <textarea id="message" name="message" maxlength="1000" placeholder="Tell us what you want to learn or ask"></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <label class="consent" for="consent">
+            <input type="checkbox" id="consent" name="consent" required>
+            <span>I confirm these details are correct and agree to be contacted about this registration. <span class="required-mark">*</span></span>
+          </label>
+          <button class="submit-button" id="submitButton" type="submit">Submit registration <span aria-hidden="true">→</span></button>
+          <p class="privacy">Your details will be saved in the registration spreadsheet and used to contact you about your enquiry.</p>
+        </form>
+        <iframe class="submission-frame" id="registrationResponse" name="registrationResponse" title="Registration submission response" tabindex="-1"></iframe>
+      </div>
+    </section>
+
+    <aside class="side-card" aria-labelledby="next-title">
+      <h2 id="next-title">What happens next?</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-number" aria-hidden="true">1</span>
+          <div><strong>Submit your details</strong><span>Enter your correct contact information and course choice.</span></div>
+        </li>
+        <li>
+          <span class="step-number" aria-hidden="true">2</span>
+          <div><strong>Registration follow-up</strong><span>Our team will contact you to discuss your course and next steps.</span></div>
+        </li>
+        <li>
+          <span class="step-number" aria-hidden="true">3</span>
+          <div><strong>Confirm your course</strong><span>Finalize your schedule and arrangements with the team.</span></div>
+        </li>
+      </ol>
+      <div class="side-note"><strong>Need help?</strong><br>Contact D-Anmol Enterprises through its official contact details.</div>
+    </aside>
+  </main>
+
+  <footer>© D-Anmol Enterprises <span aria-hidden="true">·</span> Internship <span aria-hidden="true">·</span> Teaching <span aria-hidden="true">·</span> IT Training</footer>
+</body>
+</html>
