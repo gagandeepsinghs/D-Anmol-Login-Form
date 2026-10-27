@@ -1,12 +1,9 @@
-const REGISTRATION_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz4MYBD1w8txg5AiPvS8_5c2rRebUsDCBJ2uORPJm-lxDZL5mlwe5HrTQGlzp_1_QjhSA/exec';
-const RESPONSE_TIMEOUT_MS = 45_000;
+const SUPABASE_URL = 'https://gfmzjwglqfwyvyhwuyrs.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vZTxzLVnFQepjUepaA4w6Q_E6Tx32HL';
 
 const form = document.getElementById('registrationForm');
 const notice = document.getElementById('notice');
 const submitButton = document.getElementById('submitButton');
-const responseFrame = document.getElementById('registrationResponse');
-let pendingToken = null;
-let responseTimeout = null;
 
 const validators = {
   name(value) {
@@ -59,30 +56,7 @@ form.querySelectorAll('input, select, textarea').forEach(field => {
   field.addEventListener('change', () => validateField(field));
 });
 
-window.addEventListener('message', event => {
-  if (event.source !== responseFrame.contentWindow || !pendingToken) return;
-
-  const result = event.data;
-  if (!result || result.type !== 'registration-result' || result.token !== pendingToken) return;
-
-  window.clearTimeout(responseTimeout);
-  pendingToken = null;
-  setSubmitting(false);
-
-  if (!result.ok) {
-    showNotice(result.message || 'We could not submit your registration. Please try again later.', 'error');
-    return;
-  }
-  form.reset();
-  showNotice(
-    result.emailWarning
-      ? 'Your registration was saved, but an email could not be sent. Please contact us if you need confirmation.'
-      : 'Your registration was submitted successfully. A confirmation email has been sent to the email address you provided.',
-    result.emailWarning ? 'warning' : 'success'
-  );
-});
-
-form.addEventListener('submit', event => {
+form.addEventListener('submit', async event => {
   event.preventDefault();
   notice.className = 'notice';
 
@@ -109,34 +83,71 @@ form.addEventListener('submit', event => {
     return;
   }
 
-  if (!REGISTRATION_ENDPOINT) {
-    showNotice('The Google Sheet connection is not deployed yet. Follow the setup steps in README.txt, then add the web app URL to the website.', 'error');
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    showNotice('The registration database is not configured. Please contact the website administrator.', 'error');
     return;
   }
 
-  if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(REGISTRATION_ENDPOINT)) {
-    showNotice('The Google Apps Script URL is not valid. Use the deployed web app URL ending in /exec.', 'error');
+  if (document.getElementById('website').value) {
+    showNotice('We could not submit your registration. Please try again.', 'error');
     return;
   }
-
-  let tokenField = form.querySelector('input[name="submissionToken"]');
-  if (!tokenField) {
-    tokenField = document.createElement('input');
-    tokenField.type = 'hidden';
-    tokenField.name = 'submissionToken';
-    form.append(tokenField);
-  }
-  pendingToken = crypto.randomUUID();
-  tokenField.value = pendingToken;
 
   setSubmitting(true);
-  form.action = REGISTRATION_ENDPOINT;
-  form.target = responseFrame.name;
-  responseTimeout = window.setTimeout(() => {
-    if (!pendingToken) return;
-    pendingToken = null;
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 45_000);
+  const registration = {
+    name: name.value,
+    course_date: document.getElementById('courseDate').value || null,
+    phone: document.getElementById('phone').value.trim(),
+    email: email.value,
+    address: document.getElementById('address').value.trim() || null,
+    course: document.getElementById('course').value,
+    program: document.getElementById('program').value,
+    duration: document.getElementById('duration').value || null,
+    education: document.getElementById('education').value.trim() || null,
+    message: document.getElementById('message').value.trim() || null,
+    consent: document.getElementById('consent').checked
+  };
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify(registration),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      const details = await response.json().catch(() => null);
+      console.error('Supabase registration failed:', response.status, details);
+      showNotice(
+        response.status === 401 || response.status === 403
+          ? 'The database rejected the submission. Check the registrations table permissions and row security policy.'
+          : response.status === 404
+            ? 'The registrations table was not found. Run the Supabase setup SQL, then try again.'
+            : 'We could not save your registration. Please try again later.',
+        'error'
+      );
+      return;
+    }
+
+    form.reset();
+    showNotice('Your registration was submitted successfully.', 'success');
+  } catch (error) {
+    console.error('Could not reach Supabase:', error);
+    showNotice(
+      error.name === 'AbortError'
+        ? 'The database did not respond in time. Check your connection before trying again.'
+        : 'Could not connect to the registration database. Please check your connection and try again.',
+      'error'
+    );
+  } finally {
+    window.clearTimeout(timeout);
     setSubmitting(false);
-    showNotice('We did not receive a response from Google. Check your email and spreadsheet before trying again to avoid a duplicate registration.', 'error');
-  }, RESPONSE_TIMEOUT_MS);
-  HTMLFormElement.prototype.submit.call(form);
+  }
 });
