@@ -25,8 +25,9 @@ This cannot be completed from the website files alone.
 6. Set "Execute as" to your Google account and "Who has access" to "Anyone".
    The script needs your account's permission to add rows and send mail.
 7. Click Deploy and copy the web app URL ending in /exec.
-8. In assets/js/registration.js, replace the empty REGISTRATION_ENDPOINT value
-   with that URL, keeping the URL inside the quotes.
+8. In assets/js/registration.js, set REGISTRATION_ENDPOINT to the deployed web
+   app URL, keeping the URL inside the quotes. If you create a new deployment,
+   update this value and republish the website.
 9. Publish the updated website and submit one test registration. Confirm it
    appears in the Registrations tab and that the student and business inbox
    receive the expected messages.
